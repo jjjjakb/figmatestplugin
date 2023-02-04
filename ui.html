@@ -1,21 +1,57 @@
-<h2>Select Social Media Platforms</h2>
-<p>
-  <input type="checkbox" id="twitter" value="twitter">Twitter<br>
-  <input type="checkbox" id="instagram" value="instagram">Instagram<br>
-  <input type="checkbox" id="linkedin" value="linkedin">LinkedIn<br>
-  <input type="checkbox" id="facebook" value="facebook">Facebook<br>
-</p>
-<button id="create">Create</button>
-<button id="cancel">Cancel</button>
+<link rel="stylesheet" href="https://unpkg.com/figma-plugin-ds@1.0.1/dist/figma-plugin-ds.css">
+<style>
+ .form-group {padding-top: 10px;
+  padding-left: 40px;
+}
+  </style>
+<div class="form-group">
+  <h2 class="type type--xlarge type--bold">Enter Google Sheets Share Link</h2>
+  <p class="form-group__description">
+    <input type="text" id="sheetLink" class="form-control">
+  </p>
+</div>
+
+<div class="form-group">
+  <button id="create" class="button--primary">Create</button>
+  <button id="cancel" class="button--secondary">Cancel</button>
+</div>
+
 <script>
-  document.getElementById('create').onclick = () => {
-    const platforms = [...document.querySelectorAll("input[type='checkbox']:checked")].map(checkbox => checkbox.value);
-    if (platforms.length === 0) {
+  // Function to extract Spreadsheet ID from share link
+  function getSpreadsheetId(link) {
+    const linkParts = link.split("/");
+    return linkParts[linkParts.length - 2];
+  }
+
+  // Function to fetch data from Google Sheets API
+  async function fetchData(spreadsheetId) {
+    const API_KEY = "AIzaSyC612hRdgmMBO3ZJvWUiIAXoIW6nGvZUiE";
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:D10/?key=${API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.values;
+  }
+
+  // Event handler for the "Create" button
+  document.getElementById('create').onclick = async () => {
+    const sheetLink = document.getElementById('sheetLink').value;
+    if (!sheetLink) {
       return;
     }
-    parent.postMessage({ pluginMessage: { type: 'create-frame', platforms } }, '*');
+    const spreadsheetId = getSpreadsheetId(sheetLink);
+    try {
+      const values = await fetchData(spreadsheetId);
+      console.log(values);
+      if (values.length === 0) {
+        return;
+      }
+      parent.postMessage({ pluginMessage: { type: 'create-frame', values } }, '*');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
+  // Event handler for the "Cancel" button
   document.getElementById('cancel').onclick = () => {
     parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
   };

@@ -47,6 +47,7 @@ figma.ui.onmessage = async msg => {
         subText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
         testframe.appendChild(subText);
 
+
         const image = await figma.createImageAsync(
           'https://picsum.photos/200'
         );
