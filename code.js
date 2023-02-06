@@ -11,57 +11,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 figma.showUI(__html__);
 figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     if (msg.type === 'create-frame') {
-        for (const platform of msg.platforms) {
-            let width, height;
-            switch (platform) {
-                case 'twitter':
-                    width = 1024;
-                    height = 512;
-                    break;
-                case 'instagram':
-                    width = 1080;
-                    height = 1080;
-                    break;
-                case 'linkedin':
-                    width = 1024;
-                    height = 512;
-                    break;
-                case 'facebook':
-                    width = 820;
-                    height = 312;
-                    break;
-                default:
-                    width = 100;
-                    height = 100;
+        let startingX = 0;
+        let startingY = 0;
+        for (const record of msg.values) {
+            let assets = [];
+            // let parent = new Node({type:'GROUP'})
+            const frameSize = { twitter: [1024, 512], instagram: [1080, 1080], linkedin: [1920, 680], facebook: [820, 312], instagramStory: [1080, 1920] };
+            for (let i = 0; i < Object.keys(frameSize).length; i++) {
+                const testframe = figma.createFrame();
+                console.log(testframe.parent);
+                let frameWidth = frameSize[Object.keys(frameSize)[i]][0];
+                let frameHeight = frameSize[Object.keys(frameSize)[i]][1];
+                testframe.name = `frame${frameWidth}x${frameHeight}`;
+                testframe.x = startingX;
+                testframe.y = startingY;
+                startingX += frameWidth + 80;
+                testframe.resize(frameWidth, frameHeight);
+                const headlineText = figma.createText();
+                let testFont = { family: 'Inter', style: 'Regular' };
+                yield figma.loadFontAsync(testFont);
+                headlineText.x = testframe.width / 8;
+                headlineText.y = testframe.height / 8;
+                headlineText.characters = record[0];
+                headlineText.fontSize = 96;
+                headlineText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+                testframe.appendChild(headlineText);
+                const subText = figma.createText();
+                yield figma.loadFontAsync(testFont);
+                subText.x = testframe.width / 8;
+                subText.y = testframe.height / 3;
+                subText.resizeWithoutConstraints(frameWidth / 1.5, frameHeight / 3);
+                subText.characters = record[1];
+                subText.fontSize = 48;
+                subText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+                testframe.appendChild(subText);
+                const image = yield figma.createImageAsync('https://picsum.photos/200');
+                // Get the size of the image
+                const { width: imageWidth, height: imageHeight } = yield image.getSizeAsync();
+                // Set the fill of the frame to be the image
+                testframe.fills = [
+                    { type: 'IMAGE', imageHash: image.hash, scaleMode: 'FILL' }, { type: 'SOLID', color: { r: 244 / 255.0, g: 136 / 255.0, b: 31 / 255.0 }, opacity: 0.5 }
+                ];
+                assets.push(testframe);
             }
-            const frame = figma.createFrame();
-            frame.resize(width, height);
-            frame.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 1 } }];
-            figma.currentPage.appendChild(frame);
-            const text = figma.createText();
-            yield figma.loadFontAsync(text.fontName);
-            text.x = frame.x;
-            text.y = frame.y;
-            text.characters = platform;
-            text.fontSize = 18;
-            text.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
-            frame.appendChild(text);
-            // add sub heading text node
-            const subHeadingText = figma.createText();
-            subHeadingText.x = 0;
-            subHeadingText.y = 25;
-            subHeadingText.characters = 'sub heading';
-            subHeadingText.fontSize = 14;
-            subHeadingText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 1 } }];
-            frame.appendChild(subHeadingText);
-            // Use createImageAsync to create an image from a URL
-            const image = yield figma.createImageAsync('https://picsum.photos/200');
-            // Get the size of the image
-            const { width: imageWidth, height: imageHeight } = yield image.getSizeAsync();
-            // Set the fill of the frame to be the image
-            frame.fills = [{ type: 'IMAGE', imageHash: image.hash, scaleMode: 'FILL' }];
-            figma.currentPage.selection = [frame];
-            figma.viewport.scrollAndZoomIntoView([frame]);
+            const assetGroup = figma.group(assets, assets[0].parent);
+            startingY += assetGroup.height + 50;
+            startingX = 0;
         }
     }
     figma.closePlugin();

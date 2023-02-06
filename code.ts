@@ -1,7 +1,9 @@
+
+
 figma.showUI(__html__);
 
 
-// why is it all highlighted? Don't delete it all.
+
 figma.ui.onmessage = async msg => {
   if (msg.type === 'create-frame') {
     let startingX = 0
@@ -17,35 +19,37 @@ figma.ui.onmessage = async msg => {
 
         console.log(testframe.parent)
 
-        let width = frameSize[Object.keys(frameSize)[i]][0]
-        let height = frameSize[Object.keys(frameSize)[i]][1]
+        let frameWidth = frameSize[Object.keys(frameSize)[i]][0]
+        let frameHeight = frameSize[Object.keys(frameSize)[i]][1]
 
-        testframe.name = `frame${width}x${height}`
+        testframe.name = `frame${frameWidth}x${frameHeight}`
         testframe.x = startingX
         testframe.y = startingY
-        startingX += width + 80;
-        testframe.resize(width, height);
+        startingX += frameWidth + 80;
+        testframe.resize(frameWidth, frameHeight);
 
 
-        const text = figma.createText();
+        const headlineText = figma.createText();
         let testFont = { family: 'Inter', style: 'Regular' }
         await figma.loadFontAsync(testFont);
-        text.x = testframe.width / 8;
-        text.y = testframe.height / 8;
-        text.characters = record[0];
-        text.fontSize = 18;
-        text.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
-        testframe.appendChild(text);
+        headlineText.x = testframe.width / 8;
+        headlineText.y = testframe.height / 8;
+        headlineText.characters = record[0];
+        headlineText.fontSize = 96;
+        headlineText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+        testframe.appendChild(headlineText);
 
 
         const subText = figma.createText();
         await figma.loadFontAsync(testFont);
         subText.x = testframe.width / 8;
         subText.y = testframe.height / 3;
+        subText.resizeWithoutConstraints(frameWidth/1.5,frameHeight/3)
         subText.characters = record[1];
-        subText.fontSize = 18;
+        subText.fontSize = 48;
         subText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
         testframe.appendChild(subText);
+
 
         const image = await figma.createImageAsync(
           'https://picsum.photos/200'
@@ -56,7 +60,7 @@ figma.ui.onmessage = async msg => {
 
         // Set the fill of the frame to be the image
         testframe.fills = [
-          { type: 'IMAGE', imageHash: image.hash, scaleMode: 'FILL' }];
+          { type: 'IMAGE', imageHash: image.hash, scaleMode: 'FILL' },{ type: 'SOLID', color: { r: 244/ 255.0, g: 136/ 255.0, b: 31/ 255.0} , opacity : 0.5 }];
 
         assets.push(testframe);
       }

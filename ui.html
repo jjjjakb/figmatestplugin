@@ -17,6 +17,7 @@
 </div>
 
 <script>
+
   // Function to extract Spreadsheet ID from share link
   function getSpreadsheetId(link) {
     const linkParts = link.split("/");
@@ -26,7 +27,7 @@
   // Function to fetch data from Google Sheets API
   async function fetchData(spreadsheetId) {
     const API_KEY = "AIzaSyC612hRdgmMBO3ZJvWUiIAXoIW6nGvZUiE";
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:D10/?key=${API_KEY}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:D2/?key=${API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
     return data.values;
