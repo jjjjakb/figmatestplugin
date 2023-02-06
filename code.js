@@ -13,6 +13,67 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     if (msg.type === 'create-frame') {
         let startingX = 0;
         let startingY = 0;
+        console.log("did it break2");
+        fetch("https://api.openai.com/v1/images/generations", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer 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'
+            },
+            body: JSON.stringify({
+                prompt: "A cute baby sea otter",
+                n: 2,
+                size: "1024x1024"
+            })
+        });
+        const response = yield fetch("https://api.openai.com/v1/images/generations", {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer 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'
+            },
+            body: JSON.stringify({
+                prompt: "A cute baby sea otter",
+                n: 1,
+                size: "1024x1024",
+                response_format: "b64_json"
+            })
+        });
+        function base64ToBytesArr(str) {
+            const abc = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"]; // base64 alphabet
+            let result = [];
+            for (let i = 0; i < str.length / 4; i++) {
+                let chunk = [...str.slice(4 * i, 4 * i + 4)];
+                let bin = chunk.map(x => abc.indexOf(x).toString(2).padStart(6, 0)).join('');
+                let bytes = bin.match(/.{1,8}/g).map(x => +('0b' + x));
+                result.push(...bytes.slice(0, 3 - (str[4 * i + 2] == "=") - (str[4 * i + 3] == "=")));
+            }
+            return result;
+        }
+        const imageData = yield response.json();
+        const base64String = imageData.data[0].b64_json;
+        const imageConverted = base64ToBytesArr(base64String);
+        console.log(base64String);
+        console.log(imageConverted);
+        console.log("it works");
+        // figma.createImage(imageData.data[0].b64_json);
+        // .then(response => response.json())
+        // .then(data => console.log(data))
+        // .catch(error => console.error(error));
+        // console.log("did it break3");
+        // const { Configuration, OpenAIApi } = require("openai");
+        // const configuration = new Configuration({
+        //   apiKey: process.env.OPENAI_API_KEY,
+        // });
+        // const openai = new OpenAIApi(configuration);
+        // const response = await openai.createImage({
+        //   prompt: "A cute baby sea otter",
+        //   n: 2,
+        //   size: "1024x1024",
+        // });
+        // console.log(response);
         for (const record of msg.values) {
             let assets = [];
             // let parent = new Node({type:'GROUP'})

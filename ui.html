@@ -18,6 +18,7 @@
 
 <script>
 
+
   // Function to extract Spreadsheet ID from share link
   function getSpreadsheetId(link) {
     const linkParts = link.split("/");
@@ -50,6 +51,35 @@
     } catch (error) {
       console.error(error);
     }
+
+
+
+//     async function generateImage() {
+//   const endpoint = "https://api.openai.com/v1/images/generations";
+
+//   console.log("did it break1");
+
+//   const input = {
+//     model: "image-alpha-001",
+//     prompt: "Generate a picture of a cat",
+//     n: 1
+//   };
+//   const apiKey = process.env.OPENAI_API_KEY;
+
+//   const response = await fetch(endpoint, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       "Authorization": `Bearer ${apiKey}`
+//     },
+//     body: JSON.stringify(input)
+//   });
+
+//   const json = await response.json();
+//   console.log(json);
+// }
+
+
   };
 
   // Event handler for the "Cancel" button
